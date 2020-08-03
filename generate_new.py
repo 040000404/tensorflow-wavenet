@@ -83,22 +83,6 @@ def get_arguments():
         default=None,
         help='The wav file to start generation from')
     parser.add_argument(
-        '--gc_channels',
-        type=int,
-        default=None,
-        help='Number of global condition embedding channels. Omit if no '
-             'global conditioning.')
-    parser.add_argument(
-        '--gc_cardinality',
-        type=int,
-        default=None,
-        help='Number of categories upon which we globally condition.')
-    parser.add_argument(
-        '--gc_id',
-        type=int,
-        default=None,
-        help='ID of category to generate, if globally conditioned.')
-    parser.add_argument(
         '--temperature_change',
         type=str,
         default=TEMP_CHANGE,
@@ -121,18 +105,6 @@ def get_arguments():
     parser.add_argument('--tperiod', type=float, default=1)
 
     arguments = parser.parse_args()
-
-    # gc channel validation check
-    if arguments.gc_channels is not None:
-        if arguments.gc_cardinality is None:
-            raise ValueError("Globally conditioning but gc_cardinality not "
-                             "specified. Use --gc_cardinality=377 for full "
-                             "VCTK corpus.")
-
-        if arguments.gc_id is None:
-            raise ValueError("Globally conditioning, but global condition was "
-                              "not specified. Use --gc_id to specify global "
-                              "condition.")    
     return arguments
 
 def write_wav(waveform, sample_rate, filename):
@@ -181,15 +153,15 @@ def main():
         use_biases=wavenet_params['use_biases'],
         scalar_input=wavenet_params['scalar_input'],
         initial_filter_width=wavenet_params['initial_filter_width'],
-        global_condition_channels=args.gc_channels,
-        global_condition_cardinality=args.gc_cardinality)
+        global_condition_channels=None,
+        global_condition_cardinality=None)
 
     samples = tf.placeholder(tf.int32)
 
     if args.fast_generation:
-        next_sample = net.predict_proba_incremental(samples, args.gc_id)
+        next_sample = net.predict_proba_incremental(samples, None)
     else:
-        next_sample = net.predict_proba(samples, args.gc_id)
+        next_sample = net.predict_proba(samples, None)
 
     if args.fast_generation:
         sess.run(tf.global_variables_initializer())
