@@ -24,6 +24,13 @@ Default: `1`
 Default: `1`
 
 ### Graphically check the temperature change
+
+####installation
+```shell
+$ pip install matplotlib>=3.0.0
+  pip install terminalplot>=0.3.0
+```
+####Usage
 ```shell
 $ python dynamic_changer.py --form=sine --period=0.5 --min=0.4 --max=0.5
 ```
