@@ -1,3 +1,39 @@
+## Working on various parameter tweak.
+
+
+## Added features
+
+### Dynamically change temperature
+example:
+```shell
+$ python generate.py --temperature_change="dynamic" --tform=sine --tperiod=0.5 --tmin=0 --tmax=1 --wav_out_path=/path/to/generate/wavfile --samples 16000 /ckpt/path
+```
+
+#### Specific argument explanations
+`--temperature_change`: determine if dynamically change temperature or not.  
+`dynamic` or `None`. Default: `None`
+`--tform`: determine the form of temperature change.  
+`sine`, `square`, or None. Default: `None`  
+`--tmin`: determine the min value of temperature.  
+Default: `0`  
+`--tmax`: determine the max value of temperature.
+Default: `1`  
+`--tperiod`: determine the period of the temperature changing wave.
+Default: `1`
+
+#### Graphically check the temperature change
+```shell
+$ python dynamic_changer.py --form=sine --period=0.5 --min=0.4 --max=0.5
+```
+Put any value for the arguments.
+
+## Todo list
+- [ ] 
+
+
+Below is the original md file.
+---
+
 # A TensorFlow implementation of DeepMind's WaveNet paper
 
 [![Build Status](https://travis-ci.org/ibab/tensorflow-wavenet.svg?branch=master)](https://travis-ci.org/ibab/tensorflow-wavenet)
