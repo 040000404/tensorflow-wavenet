@@ -23,14 +23,14 @@ Default: `1`
 #### `--tperiod`: determine the period of the temperature changing wave.
 Default: `1`
 
-### Graphically check the temperature change
+## Graphically check the temperature change
 
-####installation
+### installation
 ```shell
 $ pip install matplotlib>=3.0.0
   pip install terminalplot>=0.3.0
 ```
-####Usage
+### Usage
 ```shell
 $ python dynamic_changer.py --form=sine --period=0.5 --min=0.4 --max=0.5
 ```
