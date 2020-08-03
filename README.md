@@ -11,9 +11,11 @@ $ python generate.py --temperature_change="dynamic" --tform=sine --tperiod=0.5 -
 
 ### Specific argument explanations
 #### `--temperature_change`: determine if dynamically change temperature or not.  
-`dynamic` or `None`. Default: `None`
+`dynamic` or `None`.  
+Default: `None`
 #### `--tform`: determine the form of temperature change.  
-`sine`, `square`, or None. Default: `None`  
+`sine`, `square`, or None.  
+Default: `None`  
 #### `--tmin`: determine the min value of temperature.  
 Default: `0`  
 #### `--tmax`: determine the max value of temperature.
