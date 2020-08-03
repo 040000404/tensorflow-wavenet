@@ -18,7 +18,7 @@ SAMPLES = 16000
 TEMPERATURE = 1.0
 TEMP_CHANGE = "static"
 LOGDIR = './logdir'
-WAVENET_PARAMS = './wavenet_params.json'
+WAVENET_PARAMS = 'wavenet_params_new.json'
 SAVE_EVERY = None
 SILENCE_THRESHOLD = 0.1
 
@@ -109,11 +109,11 @@ def get_arguments():
         help='The threshold of silence.')
 
     #additional arguments for dynamic_changer
-    parser.add_argument('--form', type=str, default=None)
-    parser.add_argument('--min', type=float, default=0)
-    parser.add_argument('--max', type=float, default=1)
-    parser.add_argument('--period', type=float, default=1)
-    parser.add_argument('--graph', type=str, default=None)
+    parser.add_argument('--tform', type=str, default=None)
+    parser.add_argument('--tmin', type=float, default=0)
+    parser.add_argument('--tmax', type=float, default=1)
+    parser.add_argument('--tperiod', type=float, default=1)
+
 
     arguments = parser.parse_args()
     if arguments.gc_channels is not None:
@@ -252,14 +252,18 @@ def main():
 
         # temperature change by every 1/5 samples
 
-        if args.temperature_change == "static":
+        if args.temperature_change == None: #static
             _temp_temperature = args.temperature
-
         elif args.temperature_change == "dynamic":
-            if step % int(args.samples/5) == 0:
-                _temp_temperature = args.temperature * np.random.rand()
+            if args.tform == None: #random
+                if step % int(args.samples/5) == 0:
+                    _temp_temperature = args.temperature * np.random.rand()
+            elif args.tform == "sine": #sine
+                _temp_temperature = dynamic.sine(args.tmin, args.tmax, args.tperiod, step, args.samples)
+            elif args.tform == "square": #square
+                _temp_temperature = dynamic.square(args.tmin, args.tmax, args.tperiod, step, args.samples)                  
         else:
-            print("wrong temperature_change value")
+                raise Exception("wrong temperature_change value")
 
         scaled_prediction = np.log(prediction) / _temp_temperature
         scaled_prediction = (scaled_prediction -
@@ -269,11 +273,10 @@ def main():
 
         # Prediction distribution at temperature=1.0 should be unchanged after
         # scaling.
-        if args.temperature == 1.0:
+        if args.temperature == 1.0 and args.temperature_change == None:
             np.testing.assert_allclose(
                     prediction, scaled_prediction, atol=1e-5,
-                    err_msg='Prediction scaling at temperature=1.0 '
-                            'is not working as intended.')
+                    err_msg = 'Prediction scaling at temperature=1.0 is not working as intended.')
 
         sample = np.random.choice(
             np.arange(quantization_channels), p=scaled_prediction)
