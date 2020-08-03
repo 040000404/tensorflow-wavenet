@@ -34,9 +34,9 @@ $ pip install matplotlib>=3.0.0
 ```shell
 $ python dynamic_changer.py --form=sine --period=0.5 --min=0.4 --max=0.5 --graph="graphic"
 ```
-#### Use `--graph="graphic"` to see the graph in new window.
-#### Use `--graph="terminal"` to see the graph in terminal.
-#### Nothing is printed if `--graph` is not set.
+Use `--graph="graphic"` to see the graph in new window.  
+Use `--graph="terminal"` to see the graph in terminal.  
+Nothing is printed if `--graph` is not set.
 
 Put any value for the arguments.
 
