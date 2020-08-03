@@ -119,7 +119,6 @@ def get_arguments():
     parser.add_argument('--tmin', type=float, default=0)
     parser.add_argument('--tmax', type=float, default=1)
     parser.add_argument('--tperiod', type=float, default=1)
-    parser.add_argument('--tgraph', type=str, default=None)
 
     arguments = parser.parse_args()
 
