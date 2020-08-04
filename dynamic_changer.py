@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import terminalplot as tplt
 import argparse
 
-FORM = None
+FORM = "sine"
 
 def get_arguments():
     parser = argparse.ArgumentParser()
@@ -12,23 +12,25 @@ def get_arguments():
     parser.add_argument('--min', type=float, default=0)
     parser.add_argument('--max', type=float, default=1)
     parser.add_argument('--period', type=float, default=1)
-    parser.add_argument('--graph', type=str, default=None)
+    parser.add_argument('--graph', type=str, default="graphic")
     return parser.parse_args()
 
 def sine(min, max, period, step, samplerate):
     input = (np.pi*2/period)/samplerate*step
     range = max-min
+    axis = (min+max)/2
     if range <= 0:
         raise Exception("wrong range of min-max")
-    return (np.sin(input)*range*0.5+range*0.5+min)
+    return (np.sin(input)*0.5*range+axis)
 
 def square(min, max, period, step, samplerate):
     input = (np.pi*2*period)/samplerate*step
+    axis = (min+max)/2
     if max-min <= 0:
         raise Exception("wrong range of min-max")
-    if sine(min, max, period, step,samplerate) > 0:
+    if sine(min, max, period, step,samplerate) > axis:
         return max
-    elif sine(min, max, period, step, samplerate) <= 0:
+    elif sine(min, max, period, step, samplerate) <= axis:
         return min
 
 def generate_value(step, samplerate, form, _min, _max, period):
@@ -54,17 +56,16 @@ def generate_graph(arrays, graph):
     y_array = arrays[1]
 
     #determine if show graph or not
-    tplt.plot(x_array, y_array)
-    if graph == 'terminal': #draw graph in terminal
-        tplt.plot(x_array, y_array)
-    elif graph == 'graphic': #generates new graphic window with matplotlib
+    if graph == "graphic": #generates new graphic window with matplotlib
         plt.scatter(x_array, y_array, color="green", marker="1", s=30)
         plt.xlabel('x_axis')
         plt.ylabel('y_axis')
         plt.title('plot')
         plt.show()
+    elif graph == "terminal": #draw graph in terminal
+        tplt.plot(x_array, y_array)
     elif graph == None:
-        pass
+        warning.warn("Graph type is assigned. No graph will be shown.")
 
 def main():
     args = get_arguments()
