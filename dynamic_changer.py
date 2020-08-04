@@ -15,35 +15,35 @@ def get_arguments():
     parser.add_argument('--graph', type=str, default=None)
     return parser.parse_args()
 
-def sine(min, max, period, step, samplesize):
-    input = (np.pi*2/period)/samplesize*step
+def sine(min, max, period, step, samplerate):
+    input = (np.pi*2/period)/samplerate*step
     range = max-min
     if range <= 0:
         raise Exception("wrong range of min-max")
     return (np.sin(input)*range*0.5+range*0.5+min)
 
-def square(min, max, period, step, samplesize):
-    input = (np.pi*2*period)/samplesize*step
+def square(min, max, period, step, samplerate):
+    input = (np.pi*2*period)/samplerate*step
     if max-min <= 0:
         raise Exception("wrong range of min-max")
-    if sine(min, max, period, step,samplesize) > 0:
+    if sine(min, max, period, step,samplerate) > 0:
         return max
-    elif sine(min, max, period, step, samplesize) <= 0:
+    elif sine(min, max, period, step, samplerate) <= 0:
         return min
 
-def generate_value(step, samplesize, form, _min, _max, period):
+def generate_value(step, samplerate, form, _min, _max, period):
     #array for graph plot
     x_array = []
     y_array = []
     arrays = [x_array, y_array]
 
     # outputs y_value as each x_value (step)
-    for x in range(samplesize):
+    for x in range(samplerate):
         x_array.append(step)
         if form == "sine":
-            y_array.append(sine(_min, _max, period, step, samplesize))         
+            y_array.append(sine(_min, _max, period, step, samplerate))         
         elif form == "square":
-            y_array.append(square(_min, _max, period, step, samplesize))
+            y_array.append(square(_min, _max, period, step, samplerate))
         else: raise Exception("wrong value on --form")
         step += 1
     return arrays
@@ -69,12 +69,12 @@ def generate_graph(arrays, graph):
 def main():
     args = get_arguments()
 
-    #set some arbitary values for step and samplesize
+    #set some arbitary values for step and samplerate
     # these values will be replaced with real values in generate.py
     step = 0
-    samplesize = 16000
+    samplerate = 16000
 
-    generate_graph(generate_value(step, samplesize, args.form, args.min, args.max, args.period), args.graph)
+    generate_graph(generate_value(step, samplerate, args.form, args.min, args.max, args.period), args.graph)
 
 if __name__ == '__main__':
     main()
