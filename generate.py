@@ -259,9 +259,9 @@ def main():
                 if step % int(args.samples/5) == 0:
                     _temp_temperature = args.temperature * np.random.rand()
             elif args.tform == "sine": #sine
-                _temp_temperature = dynamic.sine(args.tmin, args.tmax, args.tperiod, step, args.samples)
+                _temp_temperature = dynamic.sine(args.tmin, args.tmax, args.tperiod, step, wavenet_params['sample_rate'])
             elif args.tform == "square": #square
-                _temp_temperature = dynamic.square(args.tmin, args.tmax, args.tperiod, step, args.samples)                  
+                _temp_temperature = dynamic.square(args.tmin, args.tmax, args.tperiod, step, wavenet_params['sample_rate'])                  
         else:
                 raise Exception("wrong temperature_change value")
 
