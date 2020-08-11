@@ -6,7 +6,7 @@ Working on various parameter tweak.
 ### Dynamically change temperature
 example:
 ```shell
-$ python generate.py --temperature_change="dynamic" --tform=sine --tperiod=0.5 --tmin=0 --tmax=1 --wav_out_path=/path/to/generate/wavfile --samples 16000 /ckpt/path
+$ python generate.py --temperature_change=dynamic --tform=sine --tperiod=0.5 --tmin=0 --tmax=1 --tphaseshift=0.1 --wav_out_path=/path/to/generate/wavfile --samples 16000 /ckpt/path
 ```
 
 ### Specific argument explanations
@@ -21,7 +21,14 @@ Default: `0`
 #### `--tmax`: determine the max value of temperature.
 Default: `1`  
 #### `--tperiod`: determine the period of the temperature changing wave.
-Default: `1`
+Can't be written with `tfrequency`.  
+Default: `1`  
+#### `--tfrequency`: determine the frequecy of the temperature changing wave.
+Can't be written with `tperiod`.  
+Default: `None`  
+#### `--tphaseshift`: determine the phase of the temperature changing wave.  
+`1`: 2pi forward, `-1`:2pi backward
+Default: `0`  
 
 ## Graphically check the temperature change
 
