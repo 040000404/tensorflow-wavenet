@@ -25,7 +25,7 @@ def frequency_to_period(frequency):
 
 def wave(form, min, max, period, step, samplerate, samplesize, phaseshift):
     axis = 0
-    input = (np.pi*2/period) / samplerate * (step - samplerate*phaseshift) #x value mapped into 2*pi
+    input = ((np.pi*2/period) / samplerate) * (step - samplerate*phaseshift) #x value mapped into 2*pi
     range = max - min
     if form == "sine":
         return sine(range, axis, input)
@@ -94,7 +94,7 @@ def generate_graph(arrays, graph):
     elif graph == "terminal": #draw graph in terminal
         tplt.plot(x_array, y_array)
     elif graph == None:
-        warning.warn("Graph type is assigned. No graph will be shown.")
+        pass
 
 def main():
     args = get_arguments()

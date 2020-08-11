@@ -13,14 +13,16 @@ import tensorflow as tf
 from wavenet import WaveNetModel, mu_law_decode, mu_law_encode, audio_reader
 
 import dynamic_changer as dynamic
+import warnings
 
 SAMPLES = 16000
 TEMPERATURE = 1.0
-TEMP_CHANGE = "static"
 LOGDIR = './logdir'
-WAVENET_PARAMS = 'wavenet_params_new.json'
+PERIOD = 1
+WAVENET_PARAMS = 'wavenet_params_default.json'
 SAVE_EVERY = None
 SILENCE_THRESHOLD = 0.1
+
 
 def get_arguments():
     def _str_to_bool(s):
@@ -100,7 +102,7 @@ def get_arguments():
     parser.add_argument(
         '--temperature_change',
         type=str,
-        default=TEMP_CHANGE,
+        default=None,
         help='Change the temperature dynamically during generation.')
     parser.add_argument(
         '--silence_threshold',
@@ -112,8 +114,10 @@ def get_arguments():
     parser.add_argument('--tform', type=str, default=None)
     parser.add_argument('--tmin', type=float, default=0)
     parser.add_argument('--tmax', type=float, default=1)
-    parser.add_argument('--tperiod', type=float, default=1)
-
+    parser.add_argument('--tperiod', type=float, default=None)
+    parser.add_argument('--tfrequency', type=float, default=None)
+    parser.add_argument('--tphaseshift', type=float, default=0)
+    parser.add_argument('--graph', type=str, default=None)
 
     arguments = parser.parse_args()
     if arguments.gc_channels is not None:
@@ -232,6 +236,24 @@ def main():
         print('Done.')
 
     last_sample_timestamp = datetime.now()
+
+        #frequency to period change
+    if args.tfrequency is not None:
+        if args.tperiod is not None:
+            raise ValueError("Frequency and Period both assigned. Assign only one of them.")
+        else:
+            PERIOD = dynamic.frequency_to_period(args.tfrequency)
+    else:
+        if args.tperiod is not None:
+            PERIOD = args.tperiod
+        else:
+            PERIOD = 1
+
+    # generate an array of temperature for each step when called "dynamic" in tempurature-change variable
+    if args.temperature_change == "dynamic" and args.tform is not None:
+        temp_array = dynamic.generate_value(0, wavenet_params['sample_rate'], args.tform, args.tmin, args.tmax, PERIOD, args.samples, args.tphaseshift)
+
+
     for step in range(args.samples):
         if args.fast_generation:
             outputs = [next_sample]
@@ -250,18 +272,15 @@ def main():
         # Scale prediction distribution using temperature.
         np.seterr(divide='ignore')
 
-        # temperature change by every 1/5 samples
-
+        # temperature change
         if args.temperature_change == None: #static
             _temp_temperature = args.temperature
         elif args.temperature_change == "dynamic":
             if args.tform == None: #random
                 if step % int(args.samples/5) == 0:
                     _temp_temperature = args.temperature * np.random.rand()
-            elif args.tform == "sine": #sine
-                _temp_temperature = dynamic.sine(args.tmin, args.tmax, args.tperiod, step, wavenet_params['sample_rate'])
-            elif args.tform == "square": #square
-                _temp_temperature = dynamic.square(args.tmin, args.tmax, args.tperiod, step, wavenet_params['sample_rate'])                  
+            else:
+                _temp_temperature = temp_array[1][step]  
         else:
                 raise Exception("wrong temperature_change value")
 
@@ -277,11 +296,12 @@ def main():
             np.testing.assert_allclose(
                     prediction, scaled_prediction, atol=1e-5,
                     err_msg = 'Prediction scaling at temperature=1.0 is not working as intended.')
-
+        '''
         sample = np.random.choice(
             np.arange(quantization_channels), p=scaled_prediction)
         waveform.append(sample)
-
+        '''
+        
         # Show progress only once per second.
         current_sample_timestamp = datetime.now()
         time_since_print = current_sample_timestamp - last_sample_timestamp
