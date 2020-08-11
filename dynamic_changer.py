@@ -6,6 +6,7 @@ import argparse
 
 FORM = "sine"
 PERIOD = 1
+SHIFT = 0
 
 def get_arguments():
     parser = argparse.ArgumentParser()
@@ -15,53 +16,67 @@ def get_arguments():
     parser.add_argument('--period', type=float)
     parser.add_argument('--frequency', type=float, default=None)
     parser.add_argument('--graph', type=str, default="graphic")
+    parser.add_argument('--phaseshift', type=float, default=SHIFT)
     
     return parser.parse_args()
 
 def frequency_to_period(frequency):
     return 1/frequency
 
-def wave(form, min, max, period, step, samplerate, samplesize):
-    axis = (min+max)/2
-    input = (np.pi*2/period) / samplerate * step #x value mapped into 2*pi
+def wave(form, min, max, period, step, samplerate, samplesize, phaseshift):
+    axis = 0
+    input = (np.pi*2/period) / samplerate * (step - samplerate*phaseshift) #x value mapped into 2*pi
+    range = max - min
     if form == "sine":
-        return sine(min, max, axis, input)
+        return sine(range, axis, input)
     elif form == "square":
-        if sine(min, max, axis, input) >= axis:
+        if sine(range, axis, input) >= axis:
             return max
-        elif sine(min, max, axis, input) < axis:
+        elif sine(range, axis, input) < axis:
             return min
     elif form == "triangle":
-        return triangle(min, max, axis, input)
+        return triangle(range, axis, input)
     else: 
         raise Exception("wrong value on --form")
 
-def sine(min, max, axis, input):
-    range = max-min
+def sine(range, axis, input):
     if range <= 0:
         raise Exception("wrong range of min-max")
-    return (np.sin(input)*0.5*range+axis)
+    return (np.sin(input)*0.5*range)
 
-def triangle(min, max, axis, input):
+def triangle(range, axis, input):
     temp_period = (np.pi*2)*np.floor(input/(np.pi*2))
     if input%(np.pi*2) < np.pi*0.5:
-        return((max-axis)/(0.5*np.pi)*(input-temp_period))+axis
+        return((range*0.5)/(0.5*np.pi)*(input-temp_period))+axis
     elif input%(np.pi*2) < np.pi*1.5:
-        return((min-max)/(np.pi)*(input-(0.5*np.pi)-temp_period))+max
+        return((-range)/(np.pi)*(input-(0.5*np.pi)-temp_period))+range*0.5
     elif input%(np.pi*2) < np.pi*2:
-        return((axis-min)/(0.5*np.pi)*(input-(1.5*np.pi)-temp_period))+min
+        return((range*0.5)/(0.5*np.pi)*(input-(1.5*np.pi)-temp_period))-range*0.5
 
-def generate_value(step, samplerate, form, _min, _max, period, samplesize):
+def generate_value(step, samplerate, form, _min, _max, period, samplesize, phaseshift):
     #array for graph plot
     x_array = []
-    y_array = []
-    arrays = [x_array, y_array]
+    temp_y_array = []
+    
 
-    # outputs y_value as each x_value (step)
+     # outputs y_value as each x_value (step)
     for x in range(samplesize):
         x_array.append(step)
-        y_array.append(wave(form, _min, _max, period, step, samplerate, samplesize))         
+        temp_y_array.append(wave(form, _min, _max, period, step, samplerate, samplesize, phaseshift))         
         step += 1
+
+     # coordinate the min/max value of the graph
+    practical_range = max(temp_y_array)-min(temp_y_array)
+    _range = _max - _min
+     #find the proper axis    
+    if min(temp_y_array) >= 0:
+        axis = _min
+
+   
+    y_array = [i * (_range/practical_range) + _min -min(temp_y_array) for i in temp_y_array]
+    arrays = [x_array, y_array]
+ 
+
     return arrays
 
 def generate_graph(arrays, graph):   
@@ -87,8 +102,8 @@ def main():
     #set some arbitary values for step and samplerate
     # these values will be replaced with real values in generate.py
     step = 0
-    samplerate = 16000
-    samplesize = 17000
+    samplerate = 160
+    samplesize = 320
     if args.frequency is not None:
         if args.period is not None:
             raise ValueError("Frequency and Period both assigned. Assign only one of them.")
@@ -102,7 +117,7 @@ def main():
         except TypeError:
             PERIOD = 1
 
-    generate_graph(generate_value(step, samplerate, args.form, args.min, args.max, PERIOD, samplesize), args.graph)
+    generate_graph(generate_value(step, samplerate, args.form, args.min, args.max, PERIOD, samplesize, args.phaseshift), args.graph)
 
 if __name__ == '__main__':
     main()
