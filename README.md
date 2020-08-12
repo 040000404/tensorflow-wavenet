@@ -27,7 +27,7 @@ Default: `1`
 Can't be written with `tperiod`.  
 Default: `None`  
 #### `--tphaseshift`: determine the phase of the temperature changing wave.  
-`1`: 2pi forward, `-1`:2pi backward
+`1`: 2pi forward, `-1`:2pi backward  
 Default: `0`  
 
 ## Graphically check the temperature change
