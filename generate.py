@@ -296,11 +296,10 @@ def main():
             np.testing.assert_allclose(
                     prediction, scaled_prediction, atol=1e-5,
                     err_msg = 'Prediction scaling at temperature=1.0 is not working as intended.')
-        '''
+
         sample = np.random.choice(
             np.arange(quantization_channels), p=scaled_prediction)
-        waveform.append(sample)
-        '''
+
         
         # Show progress only once per second.
         current_sample_timestamp = datetime.now()
