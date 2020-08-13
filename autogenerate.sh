@@ -22,14 +22,14 @@ do
         echo "Generating ${genStep} : t=${t} s=${s}"
         trainStep=$((genStep + 1))
 
-        python3 generate_w_silence.py \
+        python3 generate.py \
         --wav_out_path=generated/0730/2008trim-160000samples_wav_seed_19-16-L-end-t_${t}-s_${s}.wav \
         --wav_seed=seed/16-19-L-end.wav \
          --temperature=${t} \
          --samples 160000 \
          logdir/train/2020-07-24T03-29-23/model.ckpt-99999 > ./generated/0730/log_${t}_${s}_L.txt
 
-         python3 generate_w_silence.py \
+         python3 generate.py \
         --wav_out_path=generated/0730/2008trim-160000samples_wav_seed_19-16-R-end-t_${t}-s_${s}.wav \
         --wav_seed=seed/16-19-R-end.wav \
          --temperature=${t} \
