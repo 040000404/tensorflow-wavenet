@@ -19,7 +19,7 @@ SAMPLES = 16000
 TEMPERATURE = 1.0
 LOGDIR = './logdir'
 PERIOD = 1
-WAVENET_PARAMS = './wavenet_params/wavenet_params_default.json'
+WAVENET_PARAMS = '.wavenet_params/wavenet_params_default.json'
 SAVE_EVERY = None
 SILENCE_THRESHOLD = 0.1
 
@@ -162,7 +162,7 @@ def main():
     
     if args.wavenet_params.startswith('wavenet_params/'):
         with open(args.wavenet_params, 'r') as config_file:
-            wavenet.params = json.load(config_file)
+            wavenet_params = json.load(config_file)
     elif args.wavenet_params.startswith('wavenet_params'):
         with open('wavenet_params/'+args.wavenet_params, 'r') as config_file:
             wavenet_params = json.load(config_file)

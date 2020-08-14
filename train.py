@@ -25,7 +25,7 @@ LOGDIR_ROOT = './logdir'
 CHECKPOINT_EVERY = 50
 NUM_STEPS = int(1e5)
 LEARNING_RATE = 1e-3
-WAVENET_PARAMS = './wavenet_params/wavenet_params_default.json'
+WAVENET_PARAMS = 'wavenet_params/wavenet_params_default.json'
 STARTED_DATESTRING = "{0:%Y-%m-%dT%H-%M-%S}".format(datetime.now())
 SAMPLE_SIZE = 100000
 L2_REGULARIZATION_STRENGTH = 0
@@ -205,7 +205,7 @@ def main():
     # open wavenet_params file
     if args.wavenet_params.startswith('wavenet_params/'):
         with open(args.wavenet_params, 'r') as config_file:
-            wavenet.params = json.load(config_file)
+            wavenet_params = json.load(config_file)
     elif args.wavenet_params.startswith('wavenet_params'):
         with open('wavenet_params/'+args.wavenet_params, 'r') as config_file:
             wavenet_params = json.load(config_file)
