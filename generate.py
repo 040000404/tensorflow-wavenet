@@ -19,7 +19,7 @@ SAMPLES = 16000
 TEMPERATURE = 1.0
 LOGDIR = './logdir'
 PERIOD = 1
-WAVENET_PARAMS = 'wavenet_params_default.json'
+WAVENET_PARAMS = './wavenet_params/wavenet_params_default.json'
 SAVE_EVERY = None
 SILENCE_THRESHOLD = 0.1
 
@@ -160,12 +160,14 @@ def main():
     started_datestring = "{0:%Y-%m-%dT%H-%M-%S}".format(datetime.now())
     logdir = os.path.join(args.logdir, 'generate', started_datestring)
     
-    # open wavenet_params file
-    if args.wavenet_params.startswith('wavenet_params_'):
+    if args.wavenet_params.startswith('wavenet_params/'):
         with open(args.wavenet_params, 'r') as config_file:
+            wavenet.params = json.load(config_file)
+    elif args.wavenet_params.startswith('wavenet_params'):
+        with open('wavenet_params/'+args.wavenet_params, 'r') as config_file:
             wavenet_params = json.load(config_file)
     else:
-        with open('wavenet_params_'+args.wavenet_params, 'r') as config_file:
+        with open('wavenet_params/wavenet_params_'+args.wavenet_params, 'r') as config_file:
             wavenet_params = json.load(config_file)    
 
     sess = tf.Session()
