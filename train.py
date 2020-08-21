@@ -24,12 +24,12 @@ DATA_DIRECTORY = './VCTK-Corpus'
 LOGDIR_ROOT = './logdir'
 CHECKPOINT_EVERY = 50
 NUM_STEPS = int(1e5)
-LEARNING_RATE = 1e-3
+LEARNING_RATE = 1e-2
 WAVENET_PARAMS = 'wavenet_params/wavenet_params_default.json'
-STARTED_DATESTRING = "{0:%Y-%m-%dT%H-%M-%S}".format(datetime.now())
-SAMPLE_SIZE = 100000
+STARTED_DATESTRING = "{0:%Y%m%d_%H:%M}".format(datetime.now())
+SAMPLE_SIZE = 80000
 L2_REGULARIZATION_STRENGTH = 0
-SILENCE_THRESHOLD = 0.3
+SILENCE_THRESHOLD = 0.01
 EPSILON = 0.001
 MOMENTUM = 0.9
 MAX_TO_KEEP = 5
@@ -139,12 +139,12 @@ def load(saver, sess, logdir):
         return None
 
 
-def get_default_logdir(logdir_root):
-    logdir = os.path.join(logdir_root, 'train', STARTED_DATESTRING)
+def get_default_logdir(logdir_root, _dataset):
+    logdir = os.path.join(logdir_root, 'train', STARTED_DATESTRING+"_"+_dataset)
     return logdir
 
 
-def validate_directories(args):
+def validate_directories(args, _dataset):
     """Validate and arrange directory related arguments."""
 
     # Validation
@@ -169,7 +169,7 @@ def validate_directories(args):
 
     logdir = args.logdir
     if logdir is None:
-        logdir = get_default_logdir(logdir_root)
+        logdir = get_default_logdir(logdir_root, _dataset)
         print('Using default logdir: {}'.format(logdir))
 
     restore_from = args.restore_from
@@ -187,9 +187,11 @@ def validate_directories(args):
 
 def main():
     args = get_arguments()
+    dataformdir = args.data_dir.split("/")
+    _dataset = dataformdir[len(dataformdir)-1]
 
     try:
-        directories = validate_directories(args)
+        directories = validate_directories(args, _dataset)
     except ValueError as e:
         print("Some arguments are wrong:")
         print(str(e))
@@ -203,7 +205,7 @@ def main():
     is_overwritten_training = logdir != restore_from
 
     # open wavenet_params file
-    if args.wavenet_params.startswith('wavenet_params/'):
+    if args.wavenet_params.startswith('wavenet_params/') or args.wavenet_params.startswith('.'):
         with open(args.wavenet_params, 'r') as config_file:
             wavenet_params = json.load(config_file)
     elif args.wavenet_params.startswith('wavenet_params'):
